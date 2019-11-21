@@ -22,10 +22,17 @@
         </header>
             
         {% block content %}
- 
-        {% endblock content %}
         
-              
+        {% endblock content %}
+        <div id="linux">
+            {% include "helloapp/linux.html" %}
+        </div>
+        <div id="window">
+            {% include "helloapp/window.html" %}
+        </div>
+        <div id="macos">
+            {% include "helloapp/macos.html" %}
+        </div>
         <!-- End Page Content -->
         </div>
             
