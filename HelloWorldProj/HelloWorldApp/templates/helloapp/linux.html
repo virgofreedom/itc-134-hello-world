@@ -1,1 +1,90 @@
-<h1>Linux Description Here</h1>
+<h1 class="w3-center">Installation on Ubuntu 18.04</h1>
+<h2>Getting started</h2>
+<p>First of all, we need to update our server by type this :</p>
+<span>sudo apt-get update</span>
+<p>Next, we need requisite software packages to help django work correctly.<br>
+Nowaday, we have 2 version of Python3, Python2:<br>
+If you use python3 :<br>
+<span>
+    sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib
+</span><br>
+If you use python2 :<br>
+<span>sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib</span>
+</p>
+<h2>Setting up database</h2>
+<p>After the installation of the software packages are finish, now we need to setup our database. <br>
+the database use with django is <b>PostgreSQL</b>. To setup it up, we go log in to it.
+</p>
+<span>sudo -u postgres psql</span>
+<p>Create a database for your project. In this case, the database name is “project”.</p>
+<span>postgres=# CREATE DATABASE project;</span>
+<p>Create Password</p>
+<span>postgres=# CREATE USER projectuser WITH PASSWORD 'password';</span>
+<p>Replace the ‘password’ attribute with your own strong Password.</p>
+<p>To confirm to Django’s set up parameters for database connectivity, we are going to:
+    <ul>
+        <li>Set default encoding to UTF-8</li>
+        <li>Set isolation scheme to ‘read committed’ value</li>
+        <li>Set timezone to UTC</li>
+    </ul>
+    Execute the commands below to fulfill the setup requirements
+    <span>postgres=# ALTER ROLE projectuser SET client_encoding TO 'utf8';</span><br>
+    <span>postgres=# ALTER ROLE projectuser SET default_transaction_isolation TO 'read committed';</span><br>
+    <span>postgres=# ALTER ROLE projectuser SET timezone TO 'UTC';</span><br>
+</p>
+<p>Let’s now grant database access to our newly created user <br>
+<span>postgres=# GRANT ALL PRIVILEGES ON DATABASE project TO projectuser;</span><br>
+We exit Postgres by type : <b>\q</b>
+</p>
+<h2>Setting up Virtual Environment for Django</h2>
+<p>First we need to install environment <br>
+    if running Python3 : <br><span>sudo -H pip3  install --upgrade pip</span><br>
+    if running Python2 : <br><span>sudo -H pip  install --upgrade pip</span><br>
+    then <br><span>sudo -H pip install virtualenv</span>
+</p>
+<p>Now we create a folder to store environment, project and app. <br>
+    we are now going to create and move into it with command line : <br>
+       <span>mkdir ~/dev && cd ~/dev</span> <br>
+       Now create a Python virtual environment <br>
+       <span>virtualenv projectenv</span>
+</p>
+<p>To complete our set up environment, we need to activate it first. <br>
+    <span>source projectenv/bin/activate</span><br>
+    once it activated, we need to install django and psycopg2-binary <br>
+    <span>pip install django gunicorn psycopg2-binary</span>
+</p>
+<p>Now it time to create our first project. <br>
+    <span>django-admin.py startproject project ~/dev</span><br>
+    To connect our project to database we need change change some setting. And to do this : <br>
+    <span>sudo nano project/settings.py</span><br>
+    Once, it opend, locate the block : <br>
+    <blockquote>
+    DATABASES = { <br>
+            'default': {<br>
+                'ENGINE': 'django.db.backends.sqlite3',<br>
+                'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),<br>
+            }<br>
+        }<br>
+    </blockquote>
+    and change to something like this : <br>
+    <blockquote>
+            DATABASES = { <br>
+                'default': {<br>
+                    'ENGINE': 'django.db.backends.postgresql_psycopg2',<br>
+                    'NAME': 'myproject',<br>
+                    'USER': 'myprojectuser',<br>
+                    'PASSWORD': 'password',<br>
+                    'HOST': 'localhost',<br>
+                    'PORT': '',<br>
+                }
+            }
+    </blockquote>
+</p>
+<p><b>Completing initial project setup</b>
+    , just run theses command. If there are note error. That mean to good to go.
+    <br>
+    <span>~/project/manage.py makemigrations</span><br>
+    <span>~/project/manage.py migrate</span><br>
+To see if we are correctly install Django go just run this command : <br>
+<span>~/project/manage.py runserver</span>
+</p>
